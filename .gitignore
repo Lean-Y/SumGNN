@@ -1,0 +1,6 @@
+__pycache__
+data/
+experiments/
+train_*.json
+test_*.json
+valid_*.json

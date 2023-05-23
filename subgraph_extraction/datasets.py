@@ -156,27 +156,40 @@ class SubgraphDataset(Dataset):
 
     def _prepare_subgraphs(self, nodes, r_label, n_labels):
 
-        subgraph = dgl.DGLGraph(self.graph.subgraph(nodes))
+        # subgraph = dgl.DGLGraph(self.graph.subgraph(nodes))
+
+        # Modified by Ling, no need to convert DGLGraph due to the graph is already DGLGraph.
+        subgraph = self.graph.subgraph(nodes)
+
         #print(subgraph, subgraph.nodes(), subgraph.ndata, subgraph.edges(), subgraph.edata)
-        subgraph.edata['type'] = self.graph.edata['type'][self.graph.subgraph(nodes).parent_eid]
+
+        # Modified by Ling, due to the version of DGL
+        subgraph.edata['type'] = self.graph.edata['type'][self.graph.subgraph(nodes).edata[dgl.EID]]
+        # subgraph.edata['type'] = self.graph.edata['type'][self.graph.subgraph(nodes).parent_eid]
                 
         subgraph.ndata['idx'] = torch.LongTensor(np.array(nodes))
         subgraph.ndata['ntype'] = torch.LongTensor(self.entity_type[nodes])
         subgraph.ndata['mask'] = torch.LongTensor(np.where(self.entity_type[nodes]==1, 1, 0))
-        try:
-            edges_btw_roots = subgraph.edge_id(0, 1)
-            rel_link = np.nonzero(subgraph.edata['type'][edges_btw_roots] == r_label)
-        except AssertionError:
-            pass
+        # try:
+        #     # [Ling] edge_id -> edge_ids
+        #     # edges_btw_roots = subgraph.edge_id(0, 1)
+        #     edges_btw_roots = subgraph.edge_ids(0, 1)
+        #     rel_link = np.nonzero(subgraph.edata['type'][edges_btw_roots] == r_label)
+        # except AssertionError:
+        #     pass
 
         kge_nodes = [self.kge_entity2id[self.id2entity[n]] for n in nodes] if self.kge_entity2id else None
         n_feats = self.node_features[kge_nodes] if self.node_features is not None else None
         subgraph = self._prepare_features_new(subgraph, n_labels, n_feats)
-        try:
-            edges_btw_roots = subgraph.edge_id(0, 1)
-            subgraph.remove_edges(edges_btw_roots)
-        except AssertionError:
-            pass
+        # try:
+        #     # [Ling] edge_id -> edge_ids
+        #     # edges_btw_roots = subgraph.edge_id(0, 1)
+        #     edges_btw_roots = subgraph.edge_ids(0, 1)
+        #     subgraph.remove_edges(edges_btw_roots)
+        # except AssertionError:
+        #     pass
+
+        
         return subgraph #, torch.LongTensor([head_idx, tail_idx])
 
     def _prepare_features(self, subgraph, n_labels, n_feats=None):

@@ -131,7 +131,7 @@ def process_files_ddi(files, triple_file, saved_relation2id=None, keeptrainone =
     #assert 0
     return adj_list, triplets, entity2id, relation2id, id2entity, id2relation, rel
 
-def process_files_decagon(files, triple_file, saved_relation2id=None, keeptrainone = True):
+def process_files_decagon(files, triple_file, saved_relation2id=None, keeptrainone = False):
     entity2id = {}
     relation2id = {} if saved_relation2id is None else saved_relation2id
 

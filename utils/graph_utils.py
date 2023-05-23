@@ -74,8 +74,11 @@ def ssp_multigraph_to_dgl(graph, n_feats=None):
         g_nx.add_edges_from(nx_triplets)
 
     # make dgl graph
-    g_dgl = dgl.DGLGraph(multigraph=True)
-    g_dgl.from_networkx(g_nx, edge_attrs=['type'])
+    # g_dgl = dgl.DGLGraph(multigraph=True)
+    # g_dgl.from_networkx(g_nx, edge_attrs=['type'])
+
+    # modified by Ling, new DGL version
+    g_dgl = dgl.from_networkx(g_nx, edge_attrs=['type'])
     # add node features
     if n_feats is not None:
         g_dgl.ndata['feat'] = torch.tensor(n_feats)
@@ -107,7 +110,10 @@ def move_batch_to_device_dgl(batch, device):
     # targets_neg = torch.LongTensor(targets_neg).to(device=device)
     # r_labels_neg = torch.LongTensor(r_labels_neg).to(device=device)
 
-    g_dgl_pos = send_graph_to_device(g_dgl_pos, device)
+    # g_dgl_pos = send_graph_to_device(g_dgl_pos, device)
+    # [Ling] DGL version
+    g_dgl_pos = g_dgl_pos.to(device)
+
     # g_dgl_neg = send_graph_to_device(g_dgl_neg, device)
 
     return g_dgl_pos, r_labels_pos, targets_pos
@@ -121,7 +127,9 @@ def move_batch_to_device_dgl_ddi2(batch, device):
     # targets_neg = torch.LongTensor(targets_neg).to(device=device)
     # r_labels_neg = torch.LongTensor(r_labels_neg).to(device=device)
 
-    g_dgl_pos = send_graph_to_device(g_dgl_pos, device)
+    # g_dgl_pos = send_graph_to_device(g_dgl_pos, device)
+    # [Ling] DGL version
+    g_dgl_pos = g_dgl_pos.to(device)
     # g_dgl_neg = send_graph_to_device(g_dgl_neg, device)
 
     return g_dgl_pos, r_labels_pos, targets_pos
